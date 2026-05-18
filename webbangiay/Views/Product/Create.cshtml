@@ -1,0 +1,121 @@
+﻿@model Product
+
+@{
+    // Kiểm tra Model có null không trước khi truy cập
+    var isEdit = Model != null && Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Sửa sản phẩm" : "Thêm sản phẩm mới";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header @(isEdit ? "bg-warning" : "bg-primary") text-white">
+                    <h4 class="mb-0">@ViewData["Title"]</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
+                        @if (isEdit)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <!-- Tên sản phẩm -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Tên sản phẩm</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Danh mục -->
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                                <option value="">-- Chọn danh mục --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Giá -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Price" class="form-label">Giá (VNĐ)</label>
+                                <input asp-for="Price" class="form-control" />
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OldPrice" class="form-label">Giá cũ (VNĐ)</label>
+                                <input asp-for="OldPrice" class="form-control" />
+                                <span asp-validation-for="OldPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Đường dẫn ảnh -->
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">Đường dẫn ảnh</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="~/images/tenfile.png" />
+                            <small class="text-muted">Ví dụ: ~/images/sneaker1.png</small>
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <!-- Đánh giá -->
+                        <div class="mb-3">
+                            <label asp-for="Rating" class="form-label">Đánh giá (0-5 sao)</label>
+                            <input asp-for="Rating" class="form-control" step="0.5" />
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <!-- Màu sắc -->
+                        <div class="mb-3">
+                            <label asp-for="ColorsString" class="form-label">Màu sắc (cách nhau bằng dấu phẩy)</label>
+                            <input asp-for="ColorsString" class="form-control" placeholder="#000,#fff,#e74c3c" />
+                            <small class="text-muted">Nhập mã màu hex, cách nhau bằng dấu phẩy</small>
+                        </div>
+
+                        <!-- Nhãn -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BadgeText" class="form-label">Nhãn (nếu có)</label>
+                                <input asp-for="BadgeText" class="form-control" placeholder="-20%, Mới, Hot..." />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BadgeClass" class="form-label">Màu nhãn</label>
+                                <select asp-for="BadgeClass" class="form-select">
+                                    <option value="">Mặc định (đỏ)</option>
+                                    <option value="bg-success">Xanh lá (Mới)</option>
+                                    <option value="bg-warning">Vàng (Hot)</option>
+                                    <option value="bg-info">Xanh dương</option>
+                                    <option value="bg-dark">Đen</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                            <button type="submit" class="btn @(isEdit ? "btn-warning" : "btn-primary")">
+                                @(isEdit ? "Lưu thay đổi" : "Thêm sản phẩm")
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
