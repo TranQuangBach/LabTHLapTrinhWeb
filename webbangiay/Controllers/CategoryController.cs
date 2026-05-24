@@ -6,8 +6,8 @@ namespace webbangiay.Controllers
 {
     public class CategoryController : Controller
     {
-        private static ICategoryRepository _categoryRepository;
-        private static IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductRepository _productRepository;
         public CategoryController(ICategoryRepository categoryRepository, IProductRepository productRepository)
         {
             _categoryRepository = categoryRepository;
@@ -18,7 +18,7 @@ namespace webbangiay.Controllers
             return View();
         }
 
-        /*// ========== CÁC ACTION CHO CATEGORY ==========
+        // ========== CÁC ACTION CHO CATEGORY ==========
 
         // GET: Danh sách danh mục
         public IActionResult Categories()
@@ -37,15 +37,10 @@ namespace webbangiay.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateCategory(Category category)
         {
-            // Debug: Kiểm tra dữ liệu nhận được
-            System.Diagnostics.Debug.WriteLine($"=== CREATE CATEGORY POST ===");
-            System.Diagnostics.Debug.WriteLine($"Category Name: {category?.Name}");
-            System.Diagnostics.Debug.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
-
             if (category == null)
             {
                 TempData["ErrorMessage"] = "Dữ liệu danh mục không hợp lệ!";
-                return View(category);
+                return RedirectToAction(nameof(Categories));
             }
 
             if (ModelState.IsValid)
@@ -59,7 +54,7 @@ namespace webbangiay.Controllers
                     if (existingCategory != null)
                     {
                         ModelState.AddModelError("Name", "Tên danh mục đã tồn tại!");
-                        return View(category);
+                        return RedirectToAction(nameof(Categories));
                     }
 
                     _categoryRepository.AddCategory(category);
@@ -84,7 +79,7 @@ namespace webbangiay.Controllers
                 }
             }
 
-            return View(category);
+            return RedirectToAction(nameof(Categories));
         }
 
         // GET: Sửa danh mục
@@ -153,7 +148,7 @@ namespace webbangiay.Controllers
 
             // Trả về View Index với products đã được lọc
             return View("Index", products);
-        }*/
+        }
     }
 }
 

@@ -1,5 +1,60 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Product
+
 @{
+    ViewData["Title"] = "Chi tiết sản phẩm";
 }
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <img src="@Url.Content(Model.ImageUrl)" class="img-fluid" alt="@Model.Name"
+                 onerror="this.src='https://via.placeholder.com/500x400?text=No+Image'">
+        </div>
+        <div class="col-md-6">
+            <h2>@Model.Name</h2>
+            <span class="badge bg-info mb-3">@Model.Category?.Name</span>
+
+            <div class="star-rating mb-3">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Floor(Model.Rating))
+                    {
+                        <i class="bi bi-star-fill text-warning"></i>
+                    }
+                    else if (i - Model.Rating < 0.5)
+                    {
+                        <i class="bi bi-star-half text-warning"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-star text-warning"></i>
+                    }
+                }
+                <span class="text-muted">(@Model.Rating)</span>
+            </div>
+
+            <p class="lead">@Model.Description</p>
+
+            <h3 class="text-danger">@Model.Price.ToString("#,0")₫</h3>
+            @if (Model.OldPrice.HasValue)
+            {
+                <span class="text-muted text-decoration-line-through">@Model.OldPrice.Value.ToString("#,0")₫</span>
+            }
+
+            <div class="mt-4">
+                <h5>Màu sắc:</h5>
+                <div class="color-options">
+                    @foreach (var color in Model.Colors ?? new List<string>())
+                    {
+                        <div class="color-dot" style="background: @color; width: 30px; height: 30px;"></div>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+            </div>
+        </div>
+    </div>
+</div>

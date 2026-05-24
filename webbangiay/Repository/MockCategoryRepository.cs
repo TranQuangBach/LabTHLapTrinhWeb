@@ -7,19 +7,26 @@ namespace webbangiay.Repository
 {
     public class MockCategoryRepository : ICategoryRepository
     {
-        private static List<Category> _categoryList;
+        private static readonly List<Category> _categoryList = new List<Category>();
         private static int _nextId;
+        private static readonly object _lock = new object();
 
         public MockCategoryRepository()
         {
-            _categoryList = new List<Category>
+            lock (_lock)
             {
-                new Category { Id = 1, Name = "Style" },
-                new Category { Id = 2, Name = "Running" },
-                new Category { Id = 3, Name = "Basketball" },
-                new Category { Id = 4, Name = "Skateboard" }
-            };
-            _nextId = _categoryList.Max(c => c.Id) + 1;
+                if (_categoryList == null)
+                {
+                    _categoryList = new List<Category>
+                {
+                    new Category { Id = 1, Name = "Style" },
+                    new Category { Id = 2, Name = "Running" },
+                    new Category { Id = 3, Name = "Basketball" },
+                    new Category { Id = 4, Name = "Skateboard" }
+                };
+                    _nextId = _categoryList.Max(c => c.Id) + 1;
+                }
+            }
         }
 
         public IEnumerable<Category> GetAllCategories()

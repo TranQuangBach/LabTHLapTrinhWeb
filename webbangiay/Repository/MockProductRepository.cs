@@ -9,15 +9,17 @@ namespace webbangiay.Repository
     {
         private static List<Product> _products; // Đổi thành static để dùng chung
         private static int _nextId;
+        private static readonly object _lock = new object();
 
         public MockProductRepository()
         {
-            // Khởi tạo dữ liệu chỉ 1 lần duy nhất
-            if (_products == null)
+            lock (_lock)
             {
-                _products = new List<Product>
+                if (_products == null)
                 {
-                    new Product
+                    _products = new List<Product>
+                    {
+                        new Product
                     {
                         Id = 1,
                         Name = "Nike Air Max 270",
@@ -101,11 +103,14 @@ namespace webbangiay.Repository
                         BadgeClass = "",
                         CategoryId = 1
                     }
-                };
-                _nextId = _products.Max(p => p.Id) + 1;
+                    };
+                    _nextId = _products.Max(p => p.Id) + 1;
+                }
             }
         }
 
+
+        
         public IEnumerable<Product> GetAll()
         {
             return _products;

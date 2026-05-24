@@ -27,13 +27,13 @@
             <div class="col-md-6">
                 <label class="form-label fw-bold">Lọc theo danh mục:</label>
                 <div class="d-flex flex-wrap gap-2">
-                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm @(ViewBag.CategoryId == null ? "active" : "")">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm @(ViewBag.SelectedCategoryId == null ? "active" : "")">
                         Tất cả
                     </a>
                     @foreach (var cat in categories)
                     {
                         <a asp-action="FilterByCategory" asp-route-categoryId="@cat.Id"
-                           class="btn btn-outline-secondary btn-sm">
+                           class="btn btn-outline-secondary btn-sm @(ViewBag.SelectedCategoryId != null && (int)ViewBag.SelectedCategoryId == cat.Id ? "active" : "")">
                             @cat.Name
                         </a>
                     }
