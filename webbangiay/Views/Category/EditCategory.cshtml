@@ -7,11 +7,11 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-warning">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark fw-bold">
                     <h4 class="mb-0">@ViewData["Title"]</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if (TempData["ErrorMessage"] != null)
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -21,21 +21,21 @@
                     }
 
                     <form asp-action="EditCategory" method="post">
-                        @Html.AntiForgeryToken()  <!-- ⚠️ THÊM DÒNG NÀY -->
+                        @Html.AntiForgeryToken()
 
                         <input type="hidden" asp-for="Id" />
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Name" class="form-label">Tên danh mục</label>
+                            <label asp-for="Name" class="form-label fw-semibold">Tên danh mục</label>
                             <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Categories" class="btn btn-secondary">Quay lại</a>
-                            <button type="submit" class="btn btn-warning">
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Categories" class="btn btn-outline-secondary px-4">Quay lại</a>
+                            <button type="submit" class="btn btn-warning px-4 fw-bold">
                                 <i class="bi bi-save"></i> Lưu thay đổi
                             </button>
                         </div>

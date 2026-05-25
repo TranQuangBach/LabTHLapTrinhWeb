@@ -1,8 +1,7 @@
-﻿@model IEnumerable<Product>
+﻿@model IEnumerable<webbangiay.Models.Product>
 
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
-    var categories = ViewBag.Categories as IEnumerable<Category>;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -16,99 +15,50 @@
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
-
-<!-- Bộ lọc danh mục -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <label class="form-label fw-bold">Lọc theo danh mục:</label>
-                <div class="d-flex flex-wrap gap-2">
-                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm @(ViewBag.SelectedCategoryId == null ? "active" : "")">
-                        Tất cả
-                    </a>
-                    @foreach (var cat in categories)
-                    {
-                        <a asp-action="FilterByCategory" asp-route-categoryId="@cat.Id"
-                           class="btn btn-outline-secondary btn-sm @(ViewBag.SelectedCategoryId != null && (int)ViewBag.SelectedCategoryId == cat.Id ? "active" : "")">
-                            @cat.Name
-                        </a>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row g-4">
     @foreach (var item in Model)
     {
         <div class="col-md-4 col-lg-4">
-            <div class="card position-relative h-100">
-                @if (!string.IsNullOrEmpty(item.BadgeText))
-                {
-                    <span class="badge-sale @item.BadgeClass">@item.BadgeText</span>
-                }
-
-                <img src="@Url.Content(item.ImageUrl)" class="card-img-top" alt="@item.Name"
+            <div class="card h-100 shadow-sm">
+                <img src="@Url.Content(item.ImageUrl)" class="card-img-top p-2" alt="@item.Name"
                      onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">
 
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">@item.Name</h5>
-                    <p class="card-text text-muted small">@item.Description</p>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title fw-bold text-dark">@item.Name</h5>
+                        <p class="card-text text-muted small text-truncate">@item.Description</p>
+                        <span class="badge bg-info mb-2">@(item.Category?.Name ?? "Không rõ danh mục")</span>
 
-                    <!-- Hiển thị danh mục -->
-                    <span class="badge bg-info mb-2">
-                        @categories?.FirstOrDefault(c => c.Id == item.CategoryId)?.Name
-                    </span>
-
-                    <div class="star-rating mb-2">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            if (i <= Math.Floor(item.Rating))
+                        <div class="star-rating mb-2">
+                            @for (int i = 1; i <= 5; i++)
                             {
-                                <i class="bi bi-star-fill"></i>
+                                if (i <= Math.Floor(item.Rating))
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+                                else if (i - item.Rating < 0.5)
+                                {
+                                    <i class="bi bi-star-half text-warning"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star text-warning"></i>
+                                }
                             }
-                            else if (i - item.Rating < 0.5)
-                            {
-                                <i class="bi bi-star-half"></i>
-                            }
-                            else
-                            {
-                                <i class="bi bi-star"></i>
-                            }
-                        }
-                        <span class="text-muted small">(@item.Rating)</span>
-                    </div>
-
-                    <div class="color-options">
-                        @foreach (var color in item.Colors)
-                        {
-                            <div class="color-dot" style="background: @color;"></div>
-                        }
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                            <span class="price">@item.Price.ToString("#,0")₫</span>
-                            @if (item.OldPrice.HasValue)
-                            {
-                                <span class="old-price">@item.OldPrice.Value.ToString("#,0")₫</span>
-                            }
+                            <span class="text-muted small">(@item.Rating)</span>
                         </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <span class="text-danger fw-bold fs-5">@item.Price.ToString("#,0")₫</span>
                         <div class="btn-group">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm" title="Chi tiết">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm" title="Sửa">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Xóa">
-                                <i class="bi bi-trash"></i>
-                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm"><i class="bi bi-eye"></i></a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
                         </div>
                     </div>
                 </div>
@@ -116,12 +66,3 @@
         </div>
     }
 </div>
-
-<!-- Truyền categories vào ViewBag nếu chưa có -->
-@{
-    if (ViewBag.Categories == null)
-    {
-        var categoryRepo = Context.RequestServices.GetService<webbangiay.Repository.ICategoryRepository>();
-        ViewBag.Categories = categoryRepo?.GetAllCategories();
-    }
-}

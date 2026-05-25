@@ -4,12 +4,10 @@ namespace webbangiay.Repository
 {
     public interface ICategoryRepository
     {
-        IEnumerable<Category> GetAllCategories();
-        Category GetCategoryById(int id);
-        void AddCategory(Category category);
-        void UpdateCategory(Category category);
-        void DeleteCategory(int id);
-
-        void SaveChanges();
+        Task<IEnumerable<Category>> GetAllAsync();
+        Task<Category> GetByIdAsync(int id);
+        Task AddAsync(Category category);
+        Task UpdateAsync(Category category);
+        Task DeleteAsync(int id);
     }
 }
