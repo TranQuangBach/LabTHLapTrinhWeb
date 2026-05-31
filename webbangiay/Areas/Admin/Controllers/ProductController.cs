@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using webbangiay.Models;
-using webbangiay.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using webbangiay.Models;
+using webbangiay.Repository;
 
-namespace webbangiay.Controllers
+namespace webbangiay.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;

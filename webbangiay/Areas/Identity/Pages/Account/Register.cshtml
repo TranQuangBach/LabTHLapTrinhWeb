@@ -1,0 +1,51 @@
+﻿@page
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="auth-page">
+    <div style="min-height: 100vh; display: flex; align-items: center; padding: 32px 16px;">
+        <div class="auth-card">
+            <div class="auth-brand">
+                <h1>SNEAKERHUB</h1>
+                <h2>Tạo tài khoản</h2>
+                <p>Đã có tài khoản? <a asp-page="./Login">Đăng nhập</a></p>
+            </div>
+
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="ModelOnly" class="auth-validation-summary" role="alert"></div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.Email">Email</label>
+                    <input asp-for="Input.Email" class="auth-input" autocomplete="username" placeholder="name@example.com" />
+                    <span asp-validation-for="Input.Email" class="auth-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.Password">Mật khẩu</label>
+                    <input asp-for="Input.Password" class="auth-input" autocomplete="new-password" placeholder="••••••••" />
+                    <span asp-validation-for="Input.Password" class="auth-error"></span>
+                    <div class="auth-helper">Mật khẩu phải có ít nhất 6 ký tự</div>
+                </div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
+                    <input asp-for="Input.ConfirmPassword" class="auth-input" autocomplete="new-password" placeholder="••••••••" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="auth-error"></span>
+                </div>
+
+                <button type="submit" id="registerSubmit" class="auth-button">Đăng ký</button>
+            </form>
+
+            <div class="auth-footer">
+                Bằng cách đăng ký, bạn đồng ý với <a href="#">Điều khoản</a> và <a href="#">Chính sách bảo mật</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

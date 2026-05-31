@@ -19,7 +19,7 @@ namespace webbangiay.Models
         [Range(1000, 100000000, ErrorMessage = "Giá phải từ 1.000đ đến 100.000.000đ")]
         public decimal Price { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Required(ErrorMessage = "Đánh giá không được để trống")]
         [Range(0, 5, ErrorMessage = "Đánh giá từ 0 đến 5 sao")]
@@ -30,6 +30,6 @@ namespace webbangiay.Models
         public List<ProductImage>? Images { get; set; }
 
         [ForeignKey("CategoryId")]
-        public virtual Category Category { get; set; }
+        public virtual Category? Category { get; set; }
     }
 }

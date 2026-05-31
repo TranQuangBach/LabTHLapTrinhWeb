@@ -1,0 +1,52 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="auth-page">
+    <div style="min-height: 100vh; display: flex; align-items: center; padding: 32px 16px;">
+        <div class="auth-card">
+            <div class="auth-brand">
+                <h1>SNEAKERHUB</h1>
+                <h2>Đăng nhập</h2>
+                <p>Hoặc <a asp-page="./Register">tạo tài khoản mới</a></p>
+            </div>
+
+            <form id="account" method="post">
+                <div asp-validation-summary="ModelOnly" class="auth-validation-summary" role="alert"></div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.Email">Email</label>
+                    <input asp-for="Input.Email" class="auth-input" autocomplete="username" placeholder="name@example.com" />
+                    <span asp-validation-for="Input.Email" class="auth-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <div class="auth-password-row">
+                        <label asp-for="Input.Password">Mật khẩu</label>
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="auth-forgot-link">Quên mật khẩu?</a>
+                    </div>
+                    <input asp-for="Input.Password" class="auth-input" autocomplete="current-password" placeholder="••••••••" />
+                    <span asp-validation-for="Input.Password" class="auth-error"></span>
+                </div>
+
+                <label class="auth-checkbox">
+                    <input asp-for="Input.RememberMe" />
+                    <span>Ghi nhớ đăng nhập</span>
+                </label>
+
+                <button type="submit" id="login-submit" class="auth-button">Đăng nhập</button>
+            </form>
+
+            <div class="auth-footer">
+                Bằng cách đăng nhập, bạn đồng ý với <a href="#">Điều khoản</a> và <a href="#">Chính sách bảo mật</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

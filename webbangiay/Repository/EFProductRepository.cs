@@ -23,6 +23,7 @@ namespace webbangiay.Repository
             // lấy thông tin kèm theo category
             return await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Product product)
@@ -40,6 +41,13 @@ namespace webbangiay.Repository
             var product = await _context.Products.FindAsync(id);
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<ProductImage>> GetImagesByProductIdAsync(int productId)
+        {
+            return await _context.ProductImages
+                .Where(p => p.ProductId == productId)
+                .ToListAsync();
         }
     }
 }
