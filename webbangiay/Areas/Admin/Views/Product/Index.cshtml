@@ -23,17 +23,14 @@
 <div class="row g-4">
     @foreach (var item in Model)
     {
-        // Lấy danh sách ảnh cho từng sản phẩm
         var images = await ProductRepo.GetImagesByProductIdAsync(item.Id);
         var allImages = new List<string>();
 
-        // Thêm ảnh đại diện
         if (!string.IsNullOrEmpty(item.ImageUrl))
         {
             allImages.Add(item.ImageUrl);
         }
 
-        // Thêm ảnh phụ (không trùng)
         if (images != null && images.Any())
         {
             foreach (var img in images)
@@ -45,18 +42,18 @@
             }
         }
 
-        // Nếu không có ảnh nào thì dùng ảnh mặc định
         if (!allImages.Any())
         {
             allImages.Add("https://via.placeholder.com/300x250?text=No+Image");
         }
 
+        var carouselId = $"carousel{item.Id}";
         var imageCount = allImages.Count;
 
         <div class="col-md-4 col-lg-4">
             <div class="card h-100 shadow-sm">
-                <!-- Carousel ảnh trong card -->
-                <div id="carousel-@item.Id" class="carousel slide" data-bs-ride="false">
+                <!-- Carousel -->
+                <div id="@carouselId" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
                     <div class="carousel-inner">
                         @for (int i = 0; i < allImages.Count; i++)
                         {
@@ -72,18 +69,17 @@
 
                     @if (imageCount > 1)
                     {
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel-@item.Id" data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
                             <span class="visually-hidden">Previous</span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carousel-@item.Id" data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
                             <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
                             <span class="visually-hidden">Next</span>
                         </button>
                     }
                 </div>
 
-                <!-- Badge số lượng ảnh -->
                 @if (imageCount > 1)
                 {
                     <div class="position-absolute top-0 end-0 m-2">
@@ -141,12 +137,15 @@
 
 @section Scripts {
     <script>
-        // Khởi tạo tất cả carousel
-        var carousels = document.querySelectorAll('.carousel');
-        carousels.forEach(function(carousel) {
-            new bootstrap.Carousel(carousel, {
-                interval: false, // Không tự động chuyển
-                wrap: true
+        // Khởi tạo carousel khi DOM đã sẵn sàng
+        document.addEventListener('DOMContentLoaded', function() {
+            var carousels = document.querySelectorAll('.carousel');
+            carousels.forEach(function(carousel) {
+                new bootstrap.Carousel(carousel, {
+                    interval: false,
+                    wrap: true,
+                    touch: true
+                });
             });
         });
     </script>

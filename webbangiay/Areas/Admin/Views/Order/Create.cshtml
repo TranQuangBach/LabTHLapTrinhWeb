@@ -1,0 +1,420 @@
+﻿@model webbangiay.Models.Order
+
+@{
+    ViewData["Title"] = "Tạo đơn hàng mới";
+    var products = ViewBag.Products as IEnumerable<webbangiay.Models.Product> ?? new List<webbangiay.Models.Product>();
+}
+
+<link rel="stylesheet" href="~/css/admin-common.css" />
+<link rel="stylesheet" href="~/css/admin-order.css" />
+
+<style>
+    /* Additional styles for product selection */
+    .product-selector {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #eef2f6;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .product-selector-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0f4f8;
+        color: #1a1a1a;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .add-product-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 12px;
+        align-items: end;
+        margin-bottom: 20px;
+    }
+
+    .product-list {
+        border-top: 1px solid #eef2f6;
+        margin-top: 20px;
+    }
+
+    .product-item {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f4f8;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-name {
+        font-weight: 500;
+        color: #1a1a1a;
+    }
+
+    .product-price {
+        font-family: monospace;
+        font-weight: 500;
+        color: #059669;
+    }
+
+    .quantity-input {
+        width: 100px;
+        padding: 8px 12px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .remove-btn {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .remove-btn:hover {
+        background: #fee2e2;
+    }
+
+    .order-summary-box {
+        background: #fafbfc;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 24px;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        font-size: 14px;
+    }
+
+    .summary-line.total {
+        border-top: 2px solid #eef2f6;
+        margin-top: 10px;
+        padding-top: 16px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .summary-line.total .summary-value {
+        color: #dc2626;
+        font-family: monospace;
+        font-size: 20px;
+    }
+
+    .empty-products {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    .product-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 12px;
+        background: white;
+        font-size: 14px;
+    }
+
+    .btn-add {
+        background: #f0f0f0;
+        color: #1a1a1a;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-add:hover {
+        background: #e0e0e0;
+    }
+</style>
+
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Tạo đơn hàng</h1>
+            <p class="admin-subtitle">Thêm đơn hàng mới vào hệ thống</p>
+        </div>
+        <a asp-action="Index" class="btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Quay lại
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form asp-action="Create" method="post" id="orderForm">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <!-- Order Information Section -->
+            <div style="margin-bottom: 32px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px; color: #1a1a1a;">
+                    Thông tin đơn hàng
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="RecipientName" class="form-label">Tên người nhận *</label>
+                        <input asp-for="RecipientName" class="form-input" placeholder="Nhập tên người nhận" required />
+                        <span asp-validation-for="RecipientName" class="form-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="form-label">Số điện thoại *</label>
+                        <input asp-for="PhoneNumber" class="form-input" placeholder="Nhập số điện thoại" required />
+                        <span asp-validation-for="PhoneNumber" class="form-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ShippingAddress" class="form-label">Địa chỉ giao hàng *</label>
+                    <textarea asp-for="ShippingAddress" class="form-textarea" rows="2" placeholder="Nhập địa chỉ giao hàng" required></textarea>
+                    <span asp-validation-for="ShippingAddress" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Notes" class="form-label">Ghi chú</label>
+                    <textarea asp-for="Notes" class="form-textarea" rows="2" placeholder="Ghi chú thêm (nếu có)"></textarea>
+                    <span asp-validation-for="Notes" class="form-error"></span>
+                </div>
+            </div>
+
+            <!-- Product Selection Section -->
+            <div class="product-selector">
+                <div class="product-selector-title">
+                    <span>Danh sách sản phẩm</span>
+                    <span style="font-size: 13px; font-weight: normal; color: #666;">Thêm sản phẩm vào đơn hàng</span>
+                </div>
+
+                <div class="add-product-row">
+                    <select id="productSelect" class="product-select">
+                        <option value="">-- Chọn sản phẩm --</option>
+                        @foreach (var product in products)
+                        {
+                            <option value="@product.Id" data-name="@product.Name" data-price="@product.Price">
+                                @product.Name - @product.Price.ToString("#,0")₫
+                            </option>
+                        }
+                    </select>
+                    <input type="number" id="quantityInput" class="quantity-input" placeholder="SL" min="1" value="1" />
+                    <div></div>
+                    <button type="button" id="addProductBtn" class="btn-add">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 4px;">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                        Thêm
+                    </button>
+                </div>
+
+                <div id="productListContainer" class="product-list">
+                    @if (ViewBag.OrderItems != null && ((List<webbangiay.Models.OrderItem>)ViewBag.OrderItems).Any())
+                    {
+                        var orderItems = ViewBag.OrderItems as List<webbangiay.Models.OrderItem>;
+                        for (int i = 0; i < orderItems.Count; i++)
+                        {
+                            <div class="product-item" data-index="@i">
+                                <span class="product-name">@orderItems[i].Product?.Name</span>
+                                <span class="product-price">@orderItems[i].UnitPrice.ToString("#,0")₫</span>
+                                <input type="number" name="OrderItems[@i].Quantity" value="@orderItems[i].Quantity" class="quantity-input" min="1" onchange="updateTotal()" />
+                                <input type="hidden" name="OrderItems[@i].ProductId" value="@orderItems[i].ProductId" />
+                                <input type="hidden" name="OrderItems[@i].UnitPrice" value="@orderItems[i].UnitPrice" />
+                                <button type="button" class="remove-btn" onclick="removeProduct(this)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 6L6 18M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div id="emptyProductsMsg" class="empty-products" style="display: @(ViewBag.OrderItems != null && ((List<webbangiay.Models.OrderItem>)ViewBag.OrderItems).Any() ? "none" : "block")">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 7h-4.5L15 4H9L8.5 7H4v2h16z" />
+                        <rect x="4" y="9" width="16" height="10" rx="1" />
+                    </svg>
+                    <p>Chưa có sản phẩm nào</p>
+                    <p style="font-size: 13px;">Vui lòng thêm sản phẩm vào đơn hàng</p>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary-box">
+                <div class="summary-line">
+                    <span class="summary-label">Tạm tính</span>
+                    <span class="summary-value" id="subtotalAmount">0₫</span>
+                </div>
+                <div class="summary-line">
+                    <span class="summary-label">Phí vận chuyển</span>
+                    <span class="summary-value">0₫</span>
+                </div>
+                <div class="summary-line total">
+                    <span class="summary-label">Tổng cộng</span>
+                    <span class="summary-value" id="totalAmount">0₫</span>
+                </div>
+            </div>
+
+            <input type="hidden" id="totalAmountHidden" name="TotalAmount" value="0" />
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn-secondary">Hủy bỏ</a>
+                <button type="submit" class="btn-primary" id="submitBtn" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 6px;">
+                        <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    Tạo đơn hàng
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let productIndex = @(ViewBag.OrderItems != null ? ((List<webbangiay.Models.OrderItem>)ViewBag.OrderItems).Count : 0);
+
+    function updateTotal() {
+        let total = 0;
+        const productItems = document.querySelectorAll('.product-item');
+        
+        productItems.forEach(item => {
+            const priceText = item.querySelector('.product-price')?.innerText || '0';
+            const price = parseFloat(priceText.replace(/[^0-9]/g, '')) || 0;
+            const quantityInput = item.querySelector('input[name$=".Quantity"]');
+            const quantity = parseInt(quantityInput?.value) || 0;
+            total += price * quantity;
+        });
+
+        const subtotalElement = document.getElementById('subtotalAmount');
+        const totalElement = document.getElementById('totalAmount');
+        const totalHidden = document.getElementById('totalAmountHidden');
+        
+        if (subtotalElement) subtotalElement.innerText = total.toLocaleString('vi-VN') + '₫';
+        if (totalElement) totalElement.innerText = total.toLocaleString('vi-VN') + '₫';
+        if (totalHidden) totalHidden.value = total;
+
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = productItems.length === 0;
+        }
+    }
+
+    function removeProduct(btn) {
+        const productItem = btn.closest('.product-item');
+        if (productItem) {
+            productItem.remove();
+            updateTotal();
+            
+            const container = document.getElementById('productListContainer');
+            const emptyMsg = document.getElementById('emptyProductsMsg');
+            if (container && emptyMsg) {
+                emptyMsg.style.display = container.children.length === 0 ? 'block' : 'none';
+            }
+            
+            reindexProducts();
+        }
+    }
+
+    function reindexProducts() {
+        const container = document.getElementById('productListContainer');
+        const items = container.querySelectorAll('.product-item');
+        
+        items.forEach((item, idx) => {
+            const quantityInput = item.querySelector('input[name$=".Quantity"]');
+            const productIdInput = item.querySelector('input[name$=".ProductId"]');
+            const unitPriceInput = item.querySelector('input[name$=".UnitPrice"]');
+            
+            if (quantityInput) quantityInput.name = `OrderItems[${idx}].Quantity`;
+            if (productIdInput) productIdInput.name = `OrderItems[${idx}].ProductId`;
+            if (unitPriceInput) unitPriceInput.name = `OrderItems[${idx}].UnitPrice`;
+        });
+        
+        productIndex = items.length;
+    }
+
+    document.getElementById('addProductBtn')?.addEventListener('click', function() {
+        const productSelect = document.getElementById('productSelect');
+        const quantityInput = document.getElementById('quantityInput');
+        
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const productId = productSelect.value;
+        const productName = selectedOption?.getAttribute('data-name');
+        const productPrice = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
+        const quantity = parseInt(quantityInput?.value) || 1;
+        
+        if (!productId || quantity < 1) {
+            alert('Vui lòng chọn sản phẩm và nhập số lượng hợp lệ');
+            return;
+        }
+        
+        const container = document.getElementById('productListContainer');
+        const emptyMsg = document.getElementById('emptyProductsMsg');
+        
+        const existingItem = Array.from(container.querySelectorAll('.product-item')).find(item => {
+            const hiddenId = item.querySelector('input[name$=".ProductId"]');
+            return hiddenId && parseInt(hiddenId.value) === parseInt(productId);
+        });
+        
+        if (existingItem) {
+            const qtyInput = existingItem.querySelector('input[name$=".Quantity"]');
+            if (qtyInput) {
+                qtyInput.value = parseInt(qtyInput.value) + quantity;
+            }
+        } else {
+            const newItem = document.createElement('div');
+            newItem.className = 'product-item';
+            newItem.innerHTML = `
+                <span class="product-name">${productName}</span>
+                <span class="product-price">${productPrice.toLocaleString('vi-VN')}₫</span>
+                <input type="number" name="OrderItems[${productIndex}].Quantity" value="${quantity}" class="quantity-input" min="1" onchange="updateTotal()" />
+                <input type="hidden" name="OrderItems[${productIndex}].ProductId" value="${productId}" />
+                <input type="hidden" name="OrderItems[${productIndex}].UnitPrice" value="${productPrice}" />
+                <button type="button" class="remove-btn" onclick="removeProduct(this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            container.appendChild(newItem);
+            productIndex++;
+        }
+        
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        productSelect.value = '';
+        if (quantityInput) quantityInput.value = '1';
+        updateTotal();
+    });
+
+    // Initial total calculation
+    updateTotal();
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -5,9 +5,11 @@ using webbangiay.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace webbangiay.Controllers
 {
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;

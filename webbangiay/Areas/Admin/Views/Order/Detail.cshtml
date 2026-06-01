@@ -1,0 +1,135 @@
+﻿@model webbangiay.Models.Order
+
+@{
+    ViewData["Title"] = $"Đơn hàng #{Model.Id}";
+}
+
+<link rel="stylesheet" href="~/css/admin-common.css" />
+<link rel="stylesheet" href="~/css/admin-order.css" />
+
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Đơn hàng #@Model.Id</h1>
+            <p class="admin-subtitle">Xem và cập nhật thông tin đơn hàng</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3l4 4-7 7H10v-4l7-7z" />
+                    <path d="M4 20h16" />
+                </svg>
+                Sửa
+            </a>
+            <a asp-action="Index" class="btn-outline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-section">
+            <h3 class="section-title">Thông tin đơn hàng</h3>
+            <div class="info-group">
+                <div class="info-row">
+                    <span class="info-label">Mã đơn</span>
+                    <span class="info-value order-id">#@Model.Id</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ngày đặt</span>
+                    <span class="info-value">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Trạng thái</span>
+                    <span class="info-value">
+                        <form asp-action="UpdateStatus" method="post" class="status-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <select name="status" class="status-select" onchange="this.form.submit()">
+                                <option value="Pending" selected="@(Model.Status == "Pending")">⏳ Pending</option>
+                                <option value="Processing" selected="@(Model.Status == "Processing")">🔄 Processing</option>
+                                <option value="Shipped" selected="@(Model.Status == "Shipped")">📦 Shipped</option>
+                                <option value="Delivered" selected="@(Model.Status == "Delivered")">✅ Delivered</option>
+                                <option value="Cancelled" selected="@(Model.Status == "Cancelled")">❌ Cancelled</option>
+                            </select>
+                        </form>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tổng tiền</span>
+                    <span class="info-value price-total">@Model.TotalAmount.ToString("#,0")₫</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3 class="section-title">Thông tin giao hàng</h3>
+            <div class="info-group">
+                <div class="info-row">
+                    <span class="info-label">Người nhận</span>
+                    <span class="info-value">@(Model.RecipientName ?? "Chưa cập nhật")</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Số điện thoại</span>
+                    <span class="info-value">@(Model.PhoneNumber ?? "Chưa cập nhật")</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Địa chỉ</span>
+                    <span class="info-value">@Model.ShippingAddress</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="info-row">
+                        <span class="info-label">Ghi chú</span>
+                        <span class="info-value">@Model.Notes</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="detail-section full-width">
+            <h3 class="section-title">Sản phẩm đã đặt</h3>
+            <div class="items-table-container">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-right">Đơn giá</th>
+                            <th class="text-right">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.OrderItems != null && Model.OrderItems.Any())
+                        {
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <tr>
+                                    <td>@(item.Product?.Name ?? "Sản phẩm đã xóa")</td>
+                                    <td class="text-center">@item.Quantity</td>
+                                    <td class="text-right price">@item.UnitPrice.ToString("#,0")₫</td>
+                                    <td class="text-right price">@((item.Quantity * item.UnitPrice).ToString("#,0"))</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="empty-state-small">Không có sản phẩm nào</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right total-label">Tổng cộng</td>
+                            <td class="text-right total-price">@Model.TotalAmount.ToString("#,0")₫</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

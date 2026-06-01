@@ -15,9 +15,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages();   
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
+builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, EFOrderItemRepository>();
 
 var app = builder.Build();
 
@@ -42,6 +44,7 @@ using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
 
     // Tạo role Admin nếu chưa có
     if (!await roleManager.RoleExistsAsync("Admin"))
@@ -71,16 +74,27 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.Use(async (context, next) =>
+{
+    await next();
+
+    // Nếu response là 401 (Unauthorized) hoặc 404 và user chưa đăng nhập
+    if (context.Response.StatusCode == 401 ||
+        (context.Response.StatusCode == 404 && !context.User.Identity.IsAuthenticated))
+    {
+        context.Response.Redirect("/Identity/Account/Login");
+    }
+});
+
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Product}/{action=Index}/{id?}");
 
-//app.UseEndpoints(endpoints =>
-//{
-//    endpoints.MapControllerRoute(
-//        name: "areas",
-//        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-//});
 
 app.MapRazorPages();
 

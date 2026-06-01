@@ -1,0 +1,78 @@
+﻿@model webbangiay.Models.Order
+
+@{
+    ViewData["Title"] = $"Sửa đơn hàng #{Model.Id}";
+}
+
+<link rel="stylesheet" href="~/css/admin-common.css" />
+<link rel="stylesheet" href="~/css/admin-order.css" />
+
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Sửa đơn hàng #@Model.Id</h1>
+            <p class="admin-subtitle">Cập nhật thông tin đơn hàng</p>
+        </div>
+        <a asp-action="Index" class="btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Quay lại
+        </a>
+    </div>
+
+    <div class="form-container">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="OrderDate" />
+            <input type="hidden" asp-for="TotalAmount" />
+            <input type="hidden" asp-for="UserId" />
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-group">
+                <label asp-for="Status" class="form-label">Trạng thái</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="Pending">⏳ Pending - Chờ xử lý</option>
+                    <option value="Processing">🔄 Processing - Đang xử lý</option>
+                    <option value="Shipped">📦 Shipped - Đã giao cho vận chuyển</option>
+                    <option value="Delivered">✅ Delivered - Đã giao hàng</option>
+                    <option value="Cancelled">❌ Cancelled - Đã hủy</option>
+                </select>
+                <span asp-validation-for="Status" class="form-error"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="RecipientName" class="form-label">Tên người nhận</label>
+                    <input asp-for="RecipientName" class="form-input" placeholder="Nhập tên người nhận" />
+                    <span asp-validation-for="RecipientName" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
+                    <input asp-for="PhoneNumber" class="form-input" placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="PhoneNumber" class="form-error"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ShippingAddress" class="form-label">Địa chỉ giao hàng</label>
+                <textarea asp-for="ShippingAddress" class="form-textarea" rows="2" placeholder="Nhập địa chỉ giao hàng"></textarea>
+                <span asp-validation-for="ShippingAddress" class="form-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Notes" class="form-label">Ghi chú</label>
+                <textarea asp-for="Notes" class="form-textarea" rows="2" placeholder="Ghi chú thêm (nếu có)"></textarea>
+                <span asp-validation-for="Notes" class="form-error"></span>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn-secondary">Xem chi tiết</a>
+                <button type="submit" class="btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>

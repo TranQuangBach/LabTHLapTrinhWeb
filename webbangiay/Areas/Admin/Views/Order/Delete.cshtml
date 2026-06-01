@@ -1,0 +1,60 @@
+﻿@model webbangiay.Models.Order
+
+@{
+    ViewData["Title"] = $"Xóa đơn hàng #{Model.Id}";
+}
+
+<link rel="stylesheet" href="~/css/admin-common.css" />
+<link rel="stylesheet" href="~/css/admin-order.css" />
+
+<div class="admin-page">
+    <div class="delete-container">
+        <div class="delete-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+            </svg>
+        </div>
+
+        <h1 class="delete-title">Xóa đơn hàng #@Model.Id?</h1>
+        <p class="delete-description">
+            Hành động này không thể hoàn tác. Đơn hàng sẽ bị xóa vĩnh viễn khỏi hệ thống.
+        </p>
+
+        <div class="order-summary">
+            <div class="summary-row">
+                <span class="summary-label">Ngày đặt</span>
+                <span class="summary-value">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Khách hàng</span>
+                <span class="summary-value">@(Model.User?.Email ?? Model.RecipientName ?? "Khách lẻ")</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Tổng tiền</span>
+                <span class="summary-value price">@Model.TotalAmount.ToString("#,0")₫</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Trạng thái</span>
+                <span class="summary-value">
+                    <span class="status-badge status-@Model.Status.ToLower()">@Model.Status</span>
+                </span>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div class="delete-actions">
+                <a asp-action="Index" class="btn-cancel">Hủy bỏ</a>
+                <button type="submit" class="btn-delete">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-13" />
+                        <path d="M9 4h6" />
+                    </svg>
+                    Xác nhận xóa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
