@@ -10,7 +10,7 @@ namespace webbangiay.Repository
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(int id);
-
+        Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId);
         Task<List<ProductImage>> GetImagesByProductIdAsync(int productId);
     }
 }

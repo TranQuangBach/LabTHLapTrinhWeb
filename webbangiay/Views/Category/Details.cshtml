@@ -1,0 +1,116 @@
+﻿@model IEnumerable<webbangiay.Models.Product>
+@inject webbangiay.Repository.IProductRepository ProductRepo
+@inject webbangiay.Repository.ICategoryRepository CategoryRepo
+
+@{
+    ViewData["Title"] = ViewBag.CategoryName ?? "Danh mục sản phẩm";
+
+    // Lấy danh sách tất cả category để in ra thanh Filter
+    var allCategories = await CategoryRepo.GetAllAsync(); // Lưu ý: Đổi tên hàm lấy all category cho đúng với Repository của bạn
+
+    // ID của danh mục hiện tại (Lấy từ Route)
+    int currentCategoryId = Convert.ToInt32(ViewContext.RouteData.Values["id"]);
+}
+
+<section class="py-5 max-w-7xl mx-auto px-3 px-md-4 min-h-screen">
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold tracking-tight text-dark mb-3">@ViewBag.CategoryName</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 65ch;">
+            Khám phá các thiết kế nổi bật nhất thuộc dòng @ViewBag.CategoryName.
+        </p>
+    </div>
+
+    <div class="d-flex justify-content-md-center gap-2 overflow-x-auto py-2 mb-5" style="scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;">
+        <a asp-controller="Product" asp-action="Index"
+           class="btn btn-light border rounded-pill px-4 py-2 fw-medium text-nowrap" style="scroll-snap-align: start;">
+            Tất cả
+        </a>
+
+        @if (allCategories != null)
+        {
+            foreach (var cat in allCategories)
+            {
+                var isActive = cat.Id == currentCategoryId;
+                <a asp-controller="Category" asp-action="Details" asp-route-id="@cat.Id"
+                   class="btn @(isActive ? "btn-dark" : "btn-light border text-muted") rounded-pill px-4 py-2 fw-medium text-nowrap transition-all"
+                   style="scroll-snap-align: start;">
+                    @cat.Name
+                </a>
+            }
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-box2 fs-1 text-muted mb-3 d-block"></i>
+            <h3 class="h5 fw-bold text-dark">Chưa có sản phẩm</h3>
+            <p class="text-muted">Hiện tại chưa có sản phẩm nào thuộc danh mục này.</p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-dark rounded-pill px-4 py-2 mt-3">Xem tất cả sản phẩm</a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach (var item in Model)
+            {
+                var images = await ProductRepo.GetImagesByProductIdAsync(item.Id);
+                var allImages = new List<string>();
+
+                if (!string.IsNullOrEmpty(item.ImageUrl)) { allImages.Add(item.ImageUrl); }
+                if (images != null) { foreach (var img in images) { if (img.Url != item.ImageUrl) allImages.Add(img.Url); } }
+                if (!allImages.Any()) { allImages.Add("https://via.placeholder.com/600x750?text=No+Image"); }
+
+                var carouselId = $"carousel-cat-{item.Id}";
+                var imageCount = allImages.Count;
+
+                <div class="col">
+                    <div class="card border-0 h-100 bg-transparent group">
+                        <div id="@carouselId" class="carousel slide position-relative overflow-hidden bg-light mb-3 rounded-3" data-bs-ride="false">
+                            <div class="carousel-inner" style="aspect-ratio: 4/5;">
+                                @for (int i = 0; i < allImages.Count; i++)
+                                {
+                                    <div class="carousel-item @(i == 0 ? "active" : "") h-100">
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id" class="d-block h-100">
+                                            <img src="@Url.Content(allImages[i])" class="d-block w-100 h-100 object-fit-cover" alt="@item.Name">
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            @if (imageCount > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 shadow-sm" aria-hidden="true"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon bg-dark rounded-circle p-2 shadow-sm" aria-hidden="true"></span>
+                                </button>
+                            }
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h3 class="fs-6 fw-bold text-dark mb-0">
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none text-dark">@item.Name</a>
+                                </h3>
+                                <span class="fw-bold text-dark fs-6 ms-2">@item.Price.ToString("#,0")₫</span>
+                            </div>
+                            <p class="text-muted small mb-0">@(item.Category?.Name ?? ViewBag.CategoryName)</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var carousels = document.querySelectorAll('.carousel');
+            carousels.forEach(function(carousel) {
+                new bootstrap.Carousel(carousel, { interval: false, wrap: true });
+            });
+        });
+    </script>
+}

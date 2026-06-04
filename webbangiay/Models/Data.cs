@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using webbangiay.Models; // Bắt buộc phải using namespace chứa ApplicationUser
 
 namespace webbangiay.Data
 {
@@ -7,7 +8,9 @@ namespace webbangiay.Data
         public static async Task InitializeAsync(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            // 1. ĐỔI THÀNH UserManager<ApplicationUser>
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             // Tạo role Admin
             string[] roleNames = { "Admin", "User" };
@@ -25,11 +28,13 @@ namespace webbangiay.Data
 
             if (adminUser == null)
             {
-                adminUser = new IdentityUser
+                // 2. ĐỔI THÀNH new ApplicationUser
+                adminUser = new ApplicationUser
                 {
-                    UserName = adminEmail,
+                    UserName = adminEmail, // Bạn có thể đặt "admin" nếu muốn dùng tên ngắn
                     Email = adminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FullName = "Quản trị viên Hệ thống" // THÊM TRƯỜNG NÀY VÌ NÓ LÀ BẮT BUỘC
                 };
 
                 var result = await userManager.CreateAsync(adminUser, "Admin@123");

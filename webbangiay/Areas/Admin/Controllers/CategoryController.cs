@@ -115,6 +115,13 @@ namespace webbangiay.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var productsToDelete = await _productRepository.GetProductsByCategoryIdAsync(id);
+
+            foreach (var product in productsToDelete)
+            {
+                await _productRepository.DeleteAsync(product.Id);
+            }
+
             await _categoryRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }

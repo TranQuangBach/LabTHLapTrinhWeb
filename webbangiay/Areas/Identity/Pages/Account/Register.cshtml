@@ -18,9 +18,27 @@
                 <div asp-validation-summary="ModelOnly" class="auth-validation-summary" role="alert"></div>
 
                 <div class="auth-form-group">
+                    <label asp-for="Input.UserName">Tên đăng nhập</label>
+                    <input asp-for="Input.UserName" class="auth-input" autocomplete="username"/>
+                    <span asp-validation-for="Input.UserName" class="auth-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.FullName">Họ và Tên</label>
+                    <input asp-for="Input.FullName" class="auth-input" autocomplete="name" placeholder="Nhập đầy đủ họ tên" />
+                    <span asp-validation-for="Input.FullName" class="auth-error"></span>
+                </div>
+
+                <div class="auth-form-group">
                     <label asp-for="Input.Email">Email</label>
-                    <input asp-for="Input.Email" class="auth-input" autocomplete="username" placeholder="name@example.com" />
+                    <input asp-for="Input.Email" class="auth-input" autocomplete="email" placeholder="name@example.com" />
                     <span asp-validation-for="Input.Email" class="auth-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Input.Address">Địa chỉ</label>
+                    <input asp-for="Input.Address" class="auth-input" autocomplete="street-address"/>
+                    <span asp-validation-for="Input.Address" class="auth-error"></span>
                 </div>
 
                 <div class="auth-form-group">

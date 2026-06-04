@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<webbangiay.Models.ApplicationUser> SignInManager
+
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+    string GetActive(string pageName) => currentPage != null && currentPage.StartsWith(pageName) ? "fw-bold text-dark border-dark" : "text-muted border-transparent hover-dark";
+}
+
+<nav class="d-flex flex-column gap-1">
+    <a class="text-decoration-none py-3 border-bottom @GetActive("/Account/Manage/Index")" asp-page="./Index">
+        Hồ sơ cá nhân
+    </a>
+    <a class="text-decoration-none py-3 border-bottom @GetActive("/Account/Manage/ChangePassword")" asp-page="./ChangePassword">
+        Bảo mật
+    </a>
+    <a class="text-decoration-none py-3 border-bottom text-muted border-transparent hover-dark" href="/Order/History">
+        Lịch sử đơn hàng
+    </a>
+
+    <!-- Nút Đăng xuất dạng Link -->
+    <form class="mt-4" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+        <button type="submit" class="btn btn-link text-danger text-decoration-none p-0 fw-medium">
+            Đăng xuất tài khoản
+        </button>
+    </form>
+</nav>

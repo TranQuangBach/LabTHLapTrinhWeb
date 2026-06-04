@@ -2,53 +2,57 @@
 @inject webbangiay.Repository.IProductRepository ProductRepo
 
 @{
-    ViewData["Title"] = "Chi tiết sản phẩm";
+    ViewData["Title"] = Model.Name;
+
+    // Logic truy vấn hình ảnh gốc
     var images = await ProductRepo.GetImagesByProductIdAsync(Model.Id);
     var allImages = new List<string>();
 
-    // Chỉ thêm ảnh đại diện nếu nó chưa có trong danh sách ảnh phụ
     if (!string.IsNullOrEmpty(Model.ImageUrl))
     {
         allImages.Add(Model.ImageUrl);
     }
 
-    // Thêm ảnh phụ (KHÔNG thêm trùng với ảnh đại diện)
     if (images != null && images.Any())
     {
         foreach (var img in images)
         {
-            if (img.Url != Model.ImageUrl) // Kiểm tra tránh trùng
+            if (img.Url != Model.ImageUrl)
             {
                 allImages.Add(img.Url);
             }
         }
     }
+
+    if (!allImages.Any())
+    {
+        allImages.Add("https://via.placeholder.com/1000x1250?text=No+Image");
+    }
 }
 
-<div class="container my-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        @if (allImages.Any())
+<section class="py-5 px-3 px-md-4 max-w-7xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small fw-medium text-uppercase tracking-wider">
+            <li class="breadcrumb-item"><a href="/" class="text-muted text-decoration-none hover-dark">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/Product" class="text-muted text-decoration-none hover-dark">Cửa hàng</a></li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- Cột Trái: Gallery -->
+        <div class="col-12 col-md-7">
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm mb-3">
+                <div id="productCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner" style="aspect-ratio: 4/5;">
+                        @for (int i = 0; i < allImages.Count; i++)
                         {
-                            for (int i = 0; i < allImages.Count; i++)
-                            {
-                                <div class="carousel-item @(i == 0 ? "active" : "")">
-                                    <img src="@Url.Content(allImages[i])"
-                                         class="d-block w-100"
-                                         style="height: 400px; object-fit: cover;"
-                                         alt="Product image @(i + 1)"
-                                         onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'">
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="carousel-item active">
-                                <img src="https://via.placeholder.com/600x400?text=No+Image"
-                                     class="d-block w-100" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-item @(i == 0 ? "active" : "") h-100">
+                                <img src="@Url.Content(allImages[i])"
+                                     class="d-block w-100 h-100 object-fit-cover"
+                                     alt="Hình ảnh @Model.Name góc @(i + 1)"
+                                     onerror="this.src='https://via.placeholder.com/1000x1250?text=No+Image'">
                             </div>
                         }
                     </div>
@@ -56,76 +60,71 @@
                     @if (allImages.Count > 1)
                     {
                         <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-3 shadow-sm" aria-hidden="true"></span>
+                            <span class="visually-hidden">Trước</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-3 shadow-sm" aria-hidden="true"></span>
+                            <span class="visually-hidden">Sau</span>
                         </button>
                     }
                 </div>
             </div>
 
-            @* Hiển thị thumbnail bên dưới - CĂN ĐỀU *@
+            <!-- Thumbnails -->
             @if (allImages.Count > 1)
             {
-                <div class="row mt-3 g-2">
+                <div class="row g-2">
                     @for (int i = 0; i < allImages.Count; i++)
                     {
-                        <div class="col-3">
-                            <img src="@Url.Content(allImages[i])"
-                                 class="img-thumbnail w-100"
-                                 style="height: 80px; object-fit: cover; cursor: pointer;"
+                        <div class="col-2 col-sm-3">
+                            <div class="rounded-3 overflow-hidden border border-light-subtle cursor-pointer"
                                  onclick="goToSlide(@i)"
-                                 onerror="this.src='https://via.placeholder.com/100x80?text=No+Image'">
+                                 style="aspect-ratio: 1/1;">
+                                <img src="@Url.Content(allImages[i])"
+                                     class="w-100 h-100 object-fit-cover"
+                                     alt="Thumbnail @(i + 1)"
+                                     onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
+                            </div>
                         </div>
                     }
                 </div>
             }
         </div>
 
-        <div class="col-md-6">
-            <span class="badge bg-info mb-2 fs-6">@(Model.Category?.Name ?? "Chưa phân loại")</span>
-            <h2 class="fw-bold mb-3">@Model.Name</h2>
+        <!-- Cột Phải: Thông tin & Giỏ hàng -->
+        <div class="col-12 col-md-5">
+            <div class="position-sticky" style="top: 2rem;">
+                <span class="badge bg-light text-dark border mb-3 py-2 px-3 fw-medium">@(Model.Category?.Name ?? "Sneaker")</span>
+                <h1 class="display-6 fw-bold tracking-tight text-dark mb-2">@Model.Name</h1>
 
-            <div class="mb-4">
-                <span class="fs-2 text-danger fw-bold">@Model.Price.ToString("#,0")₫</span>
-            </div>
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <p class="fs-3 fw-bold text-dark mb-0">@Model.Price.ToString("#,0")₫</p>
+                    <div class="d-flex align-items-center text-dark">
+                        <i class="bi bi-star-fill me-1 text-dark"></i>
+                        <span class="fw-medium">@Model.Rating</span>
+                    </div>
+                </div>
 
-            <div class="star-rating mb-3">
-                @for (int i = 1; i <= 5; i++)
-                {
-                    if (i <= Math.Floor(Model.Rating))
-                    {
-                        <i class="bi bi-star-fill text-warning"></i>
-                    }
-                    else if (i - Model.Rating < 0.5)
-                    {
-                        <i class="bi bi-star-half text-warning"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-star text-warning"></i>
-                    }
-                }
-                <span class="text-muted ms-2">(@Model.Rating sao)</span>
-            </div>
+                <div class="mb-5 text-muted lh-lg" style="white-space: pre-line;">
+                    @Model.Description
+                </div>
 
-            <h5 class="fw-bold border-bottom pb-2">Mô tả sản phẩm</h5>
-            <p class="text-secondary fs-6" style="white-space: pre-line;">@Model.Description</p>
+                <form action="/Cart/Add" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id" />
 
-            <div class="mt-5 pt-3 border-top d-flex gap-2">
-                <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-left"></i> Quay lại
-                </a>
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 fw-bold">
-                    <i class="bi bi-pencil"></i> Sửa sản phẩm
-                </a>
+                    <button type="submit" class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold tracking-wider mb-3 transition-transform active-scale-down">
+                        THÊM VÀO GIỎ HÀNG
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-dark btn-lg w-100 rounded-pill py-3 fw-medium">
+                        Quay lại cửa hàng
+                    </a>
+                </form>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <script>

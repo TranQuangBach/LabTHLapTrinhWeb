@@ -1,0 +1,40 @@
+﻿@{
+    // Lấy tên Controller hiện tại để xử lý Active Menu trên Server-Side
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+}
+
+<div class="border-end bg-dark text-white" id="sidebar-wrapper" style="min-width: 250px; min-height: 100vh;">
+    <div class="sidebar-heading text-center py-4 primary-text fs-4 fw-bold text-uppercase border-bottom border-secondary">
+        <i class="bi bi-shoe-prints me-2 text-warning"></i>Giày LabTH
+    </div>
+
+    <div class="list-group list-group-flush my-3 px-2">
+
+        <a asp-area="Admin" asp-controller="Admin" asp-action="Index"
+           class="list-group-item list-group-item-action bg-transparent text-white rounded my-1 p-3 @(currentController == "Admin" ? "active text-warning fw-bold bg-secondary" : "")">
+            <i class="bi bi-speedometer2 me-3"></i>Tổng quan (Dashboard)
+        </a>
+
+        <a asp-area="Admin" asp-controller="Category" asp-action="Index"
+           class="list-group-item list-group-item-action bg-transparent text-white rounded my-1 p-3 @(currentController == "Category" ? "active text-warning fw-bold bg-secondary" : "")">
+            <i class="bi bi-tags me-3"></i>Quản lý Danh mục
+        </a>
+
+        <a asp-area="Admin" asp-controller="Product" asp-action="Index"
+           class="list-group-item list-group-item-action bg-transparent text-white rounded my-1 p-3 @(currentController == "Product" ? "active text-warning fw-bold bg-secondary" : "")">
+            <i class="bi bi-box-seam me-3"></i>Quản lý Sản phẩm
+        </a>
+
+        <a asp-area="Admin" asp-controller="Order" asp-action="Index"
+           class="list-group-item list-group-item-action bg-transparent text-white rounded my-1 p-3 @(currentController == "Order" ? "active text-warning fw-bold bg-secondary" : "")">
+            <i class="bi bi-cart-check me-3"></i>Quản lý Đơn hàng
+        </a>
+
+        <div class="border-top border-secondary my-3"></div>
+
+        <a asp-area="" asp-controller="Home" asp-action="Index" target="_blank"
+           class="list-group-item list-group-item-action bg-transparent text-muted rounded p-3">
+            <i class="bi bi-box-arrow-up-right me-3"></i>Xem Trang Chủ Cửa Hàng
+        </a>
+    </div>
+</div>

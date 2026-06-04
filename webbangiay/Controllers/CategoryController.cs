@@ -22,100 +22,23 @@ namespace webbangiay.Controllers
             _productRepository = productRepository;
         }
 
-        // GET: Hiển thị danh sách danh mục (Bất đồng bộ)
-        public async Task<IActionResult> Index()
+        // GET: Hiển thị chi tiết danh mục (Bất đồng bộ)
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
         {
-            var categories = await _categoryRepository.GetAllAsync();
-            var products = await _productRepository.GetAllAsync(); // cần inject IProductRepository
-
-            ViewBag.ProductCounts = products
-                .GroupBy(p => p.CategoryId)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            return View(categories);
-        }
-
-        // GET: Hiển thị form thêm mới danh mục
-        public IActionResult CreateCategory()
-        {
-            return View(new Category());
-        }
-
-        // POST: Xử lý lưu danh mục mới vào cơ sở dữ liệu
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCategory(Category category)
-        {
-            if (category == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (ModelState.IsValid)
-            {
-                await _categoryRepository.AddAsync(category);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
-
-        // GET: Hiển thị form cập nhật thông tin danh mục
-        public async Task<IActionResult> EditCategory(int id)
-        {
-            var category = await _categoryRepository.GetByIdAsync(id);
+            var category = await _categoryRepository.GetByIdAsync(id); // Sử dụng hàm lấy ID của bạn
             if (category == null)
             {
                 return NotFound();
             }
-            return View(category);
-        }
 
-        // POST: Xử lý cập nhật thông tin danh mục
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCategory(int id, Category category)
-        {
-            if (id != category.Id) // Kiểm tra Id truyền vào (Lưu ý: Khớp với thuộc tính CategoryId trong Model của bạn)
-            {
-                return NotFound();
-            }
+            // Lấy danh sách sản phẩm theo CategoryId
+            var products = await _productRepository.GetProductsByCategoryIdAsync(id);
 
-            if (ModelState.IsValid)
-            {
-                var existingCategory = await _categoryRepository.GetByIdAsync(id);
-                if (existingCategory == null)
-                {
-                    return NotFound();
-                }
+            // Truyền tên danh mục ra View để làm Tiêu đề
+            ViewBag.CategoryName = category.Name;
 
-                // Cập nhật thông tin tương tự bên Product
-                existingCategory.Name = category.Name;
-                // Nếu Model Category của bạn có thêm các thuộc tính khác (ví dụ Description...), hãy map thêm ở đây
-
-                await _categoryRepository.UpdateAsync(existingCategory);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
-
-        // GET: Hiển thị form xác nhận xóa danh mục
-        public async Task<IActionResult> DeleteCategory(int id)
-        {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
-        }
-
-        // POST: Xử lý xóa danh mục (Bất đồng bộ)
-        [HttpPost, ActionName("DeleteConfirmed")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _categoryRepository.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            return View(products);
         }
     }
 }

@@ -49,5 +49,14 @@ namespace webbangiay.Repository
                 .Where(p => p.ProductId == productId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .Include(p => p.Category)
+                .Include(p => p.Images)
+                .ToListAsync();
+        }
     }
 }
